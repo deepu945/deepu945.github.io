@@ -1,0 +1,135 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/reset.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="css/grid.css" type="text/css" media="screen"> 
+    <title>Admin page</title>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+</head>
+<body>
+    <div id="siginspace">
+        mail:<input type="text" id="mailid">
+        password:<input type="password" id="password">
+        <button id="signin">Login</button>
+    </div>
+    <div class="container_12">
+        <div class="wrapper">
+            <div id="signoutspace" style="display: none;">
+                <button id="signout">Logout</button>
+                <button id="refresh">Refresh</button>
+                <table id="table">
+                    <tr>
+                        <th>Name</th>
+                        <th>EMail</th>
+                        <th>Ph no.</th>
+                        <th>Message</th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.8.2/firebase-app.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyBGT1cgvuILC_dLoFwGHKiK5V-4EQtz0gU",
+          authDomain: "homedesign-9813e.firebaseapp.com",
+          projectId: "homedesign-9813e",
+          storageBucket: "homedesign-9813e.appspot.com",
+          messagingSenderId: "42062483133",
+          appId: "1:42062483133:web:2287ee8679c451bfe5b1d4"
+        };
+      
+        // Initialize Firebase
+        var mail=document.getElementById('mailid')
+        var pwd=document.getElementById('password')      
+
+        let app = initializeApp(firebaseConfig);
+        import {getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.8.2/firebase-auth.js";
+        function signingin(){
+            const auth = getAuth();
+            signInWithEmailAndPassword(auth, mail.value, password.value)
+            .then((userCredential) => {
+                // Signed in 
+                const user = userCredential.user;
+                alert('Logged in')
+                var x=document.getElementById('siginspace')
+                x.style.display='none'            
+                var x=document.getElementById('signoutspace')
+                x.style.display='block'            
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                alert(error)
+            });
+        }
+        function signingout(){
+            const auth = getAuth();
+            signOut(auth).then(() => {
+            alert('looged out')
+            var x=document.getElementById('siginspace')
+            x.style.display='block'
+            var x=document.getElementById('signoutspace')
+            x.style.display='none'            
+            }).catch((error) => {
+            // An error happened.
+            });
+        }
+        document.getElementById("signin").addEventListener("click",signingin)
+        document.getElementById("signout").addEventListener("click",signingout)
+        import {getFirestore, doc, getDocs, collection } from "https://www.gstatic.com/firebasejs/9.8.2/firebase-firestore.js";
+        const db=getFirestore();
+        async function getData(){
+            try{
+                const querySnapshot = await getDocs(collection(db, "contact"));
+                var table = document.getElementById('table');
+                querySnapshot.forEach((doc) => {
+                    var tr = document.createElement('tr');
+                    var td1 = document.createElement('td');
+                    td1.innerHTML=doc.data().name
+                    var td2 = document.createElement('td');
+                    td2.innerHTML=doc.data().email
+                    var td3 = document.createElement('td');
+                    td3.innerHTML=doc.data().ph
+                    var td4 = document.createElement('td');
+                    td4.innerHTML=doc.data().msg
+                    tr.appendChild(td1)
+                    tr.appendChild(td2)
+                    tr.appendChild(td3)
+                    tr.appendChild(td4)
+                    table.appendChild(tr)
+                    console.log(doc.data());
+                });
+                console.log(data)
+            }catch(err){
+                console.log(err)
+            }
+            
+        }
+        document.getElementById("refresh").addEventListener("click",getData)
+      </script>
+</body>
+</html>
